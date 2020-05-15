@@ -74,6 +74,53 @@ namespace NetCoreCsharpConsoleApp
             {
                 Console.WriteLine("Hi");
             }
+
+            //Switch
+            int mynumber = 10;
+            switch (mynumber)
+            {
+                case 10:
+                case 50:
+                    Console.WriteLine("Number is {0}", mynumber);
+                    break;
+                default:
+                    break;
+            }
+
+            //WHILE
+            while (mynumber < 20)
+            {
+                Console.Write("Number is {0} \n", mynumber);
+                mynumber += 1;
+            }
+
+            //DO WHILE
+            int thisnumber = 5;
+            do
+            {
+                Console.WriteLine(thisnumber);
+                thisnumber += 1;
+            } while (thisnumber < 7);
+
+            //FOR
+            for (int k = 0; k < 5; k++)
+            {
+                Console.WriteLine(k);
+            }
+
+            //FOR EACH  
+            foreach (var thisint in arrint)
+            {
+                Console.WriteLine("Array {0}", thisint);
+            }
+
+            //continue
+            for (int k = 0; k < 5; k++)
+            {
+                if (k == 3)
+                    continue;
+                Console.Write(k + "\t");
+            }
         }
     }
 
@@ -81,6 +128,6 @@ namespace NetCoreCsharpConsoleApp
     /// This is my comment
     /// </summary>
     public class SampleClass
-    { 
+    {
     }
 }

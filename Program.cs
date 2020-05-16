@@ -12,29 +12,40 @@ namespace NetCoreCsharpConsoleApp
         static void Main(string[] args)
         {
             //STATIC METHOD
-            Program.StaticMethod();
+            Console.WriteLine("---------------STATIC METHOD-----------------");
+            //Program.StaticMethod(); //commented to avoid junk display
+            Console.WriteLine("---------------------------------------------");
 
             //INSTANCE METHOD
+            Console.WriteLine("---------------INSTANCE METHOD-----------------");
             Program p = new Program();
             p.InstanceMethod();
+            Console.WriteLine("-----------------------------------------------");
 
             //METHOD PARAMETERS
+            Console.WriteLine("---------------METHOD PARAMETERS-----------------");
             int out_int;
             int ref_int = 3;
             //Program.MethodParameters(1, out out_int, ref ref_int); //params optional
             Program.MethodParameters(1, out out_int, ref ref_int, 1, 2, 3, 4, 5, 6); //any NUMBER/STRING of arguments can be passed
             Console.WriteLine("Out value {0}", out_int);
             Console.WriteLine("Ref value {0}", ref_int);
+            Console.WriteLine("-------------------------------------------------");
 
             //NAMESPACE
+            Console.WriteLine("---------------NAMESPACE-----------------");
             PAMA.ClassA.Print();
             PAMB.ClassA.Print();
+            Console.WriteLine("--------------------------------------------");
 
             //CONSTRUCTORS (static (class.) /instance (obj.) call demo is shown below)
+            Console.WriteLine("---------------CONSTRUCTORS-----------------");
             SampleConstructorClass obj = new SampleConstructorClass();
             Console.WriteLine(SampleConstructorClass._Greeting + " " + obj._firstname + " " + obj._lastname);
+            Console.WriteLine("--------------------------------------------");
 
             //22. INHERITANCE
+            Console.WriteLine("---------------INHERITANCE-----------------");
             SampleMultiLevelInheritance der = new SampleMultiLevelInheritance();
             Console.WriteLine(der._extra);
 
@@ -42,10 +53,12 @@ namespace NetCoreCsharpConsoleApp
             ((SampleDerived)der).Print();
 
             //3rd way of calling the base class Print
-            SampleDerived baseder = new SampleMultiLevelInheritance(); 
+            SampleDerived baseder = new SampleMultiLevelInheritance();
             baseder.Print();
+            Console.WriteLine("--------------------------------------------");
 
             //23. POLYMORPHISM
+            Console.WriteLine("---------------POLYMORPHISM-----------------");
             SampleBase1[] base1 = new SampleBase1[3];
             base1[0] = new SampleBase1();
             base1[1] = new SampleDerived1();
@@ -54,10 +67,62 @@ namespace NetCoreCsharpConsoleApp
             {
                 item.Print();
             }
+            Console.WriteLine("--------------------------------------------");
 
             //24.METHOD OVERRIDING VS METHOD HIDING
+            Console.WriteLine("---------------METHOD OVERRIDING VS METHOD HIDING-----------------");
             BaseClass B = new DerivedClass();
             B.Print();
+            Console.WriteLine("------------------------------------------------------------------");
+
+            //25.METHOD OVERLOADING : Return Type & Params cannot be considered in the signature of a method during overloading
+
+            //26,27. PROPERTIES
+            Console.WriteLine("---------------PROPERTIES-----------------");
+            SampleProperties oprop = new SampleProperties();
+            oprop.Name = "Xavier";
+            oprop.City = "Toronto";
+            Console.WriteLine("Name {0} City {1}", oprop.Name, oprop. City);
+            Console.WriteLine("------------------------------------------");
+
+            //28,29. STRUCTS
+            Console.WriteLine("---------------STRUCTS-----------------");
+            SampleStruct ostruct = new SampleStruct
+            {
+                _Name = "Ruben",
+                Age = 41
+            };
+            Console.WriteLine("Struct 1 : Name {0} Age {1}", ostruct._Name, ostruct.Age);
+
+            //copy one struct into another
+            SampleStruct ostruct2 = ostruct;
+            ostruct2._Name = "Roy";
+            Console.WriteLine("Struct 2 : Name {0} Age {1}", ostruct2._Name, ostruct2.Age);
+
+            //copy one class into another
+            SampleProperties oprop2 = oprop;
+            oprop2.City = "New York";
+            Console.WriteLine("Class 1 : Name {0} City {1}", oprop.Name, oprop. City);
+            Console.WriteLine("Class 2 : Name {0} City {1}", oprop2.Name, oprop2.City);
+
+            Console.WriteLine("---------------------------------------");
+
+            //30. INTERFACE
+            Console.WriteLine("---------------INTERFACE-----------------");
+            SampleInterfaceImplement imp = new SampleInterfaceImplement();
+            imp.Print1();
+            imp.Print2();
+
+            /*
+            VERY VERY IMPORTANT : 
+            We cannot create an instance of an interface, 
+            but an interface reference variable can point to a derived class object
+            */
+            //ISampleInterface2 imp2 = new ISampleInterface2();
+            ISampleInterface2 imp2 = new SampleInterfaceImplement();
+            imp2.Print2();
+
+            Console.WriteLine("---------------------------------------");
         }
 
         public static void MethodParameters(int i, out int j, ref int k, params int[] numbers)
@@ -290,6 +355,75 @@ namespace NetCoreCsharpConsoleApp
         public new void Print()
         {
             Console.WriteLine("Derived Class print");
+        }
+    }
+    #endregion
+
+    #region PROPERTIES - ENCAPSULATION
+    public class SampleProperties
+    {
+        private string _Name;
+        public string Name
+        {
+            set
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    throw new Exception("Name cannot be null or empty");
+                }
+                this._Name = value;
+            }
+            get
+            {
+                return string.IsNullOrEmpty(this._Name) ?  "Name cannot be null or empty" : this._Name;
+            }
+        }
+
+        //Automatic Properties used when no validation required on data
+        public string City { get; set; } //no private declaration required
+
+    }
+    #endregion
+
+    #region STRUCT
+    public struct SampleStruct 
+    {
+        public string _Name { get; set; }
+        public int Age { get; set; }
+    }
+    #endregion
+
+    #region INTERFACE
+
+    public interface ISampleInterface0
+    {
+        void Print0();
+    }
+    public interface ISampleInterface1 : ISampleInterface0 //interface implementing an interface
+    {
+        void Print1();
+    }
+
+    public interface ISampleInterface2
+    {
+        void Print2();
+    }
+
+    public class SampleInterfaceImplement : ISampleInterface1, ISampleInterface2 //multiple interface implementation
+    {
+        public void Print0()
+        {
+            Console.WriteLine("Interface Print 0 method called");
+        }
+
+        public void Print1()
+        {
+            Console.WriteLine("Interface Print 1 method called");
+        }
+
+        public void Print2()
+        {
+            Console.WriteLine("Interface Print 2 method called");
         }
     }
     #endregion

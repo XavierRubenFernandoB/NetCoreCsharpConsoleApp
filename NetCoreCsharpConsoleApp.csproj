@@ -5,4 +5,9 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ProjectA.ModuleA\ProjectA.ModuleA.csproj" />
+    <ProjectReference Include="..\ProjectA.ModuleB\ProjectA.ModuleB.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -1,5 +1,9 @@
 ﻿using Microsoft.VisualBasic.CompilerServices;
 using System;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using PAMA = ProjectA.ModuleA;
+using PAMB = ProjectA.ModuleB;
 
 namespace NetCoreCsharpConsoleApp
 {
@@ -7,6 +11,40 @@ namespace NetCoreCsharpConsoleApp
     {
         static void Main(string[] args)
         {
+            //STATIC METHOD
+            Program.StaticMethod();
+
+            //INSTANCE METHOD
+            Program p = new Program();
+            p.InstanceMethod();
+
+            //METHOD PARAMETERS
+            int out_int;
+            int ref_int = 3;
+            //Program.MethodParameters(1, out out_int, ref ref_int); //params optional
+            Program.MethodParameters(1, out out_int, ref ref_int, 1, 2, 3, 4, 5, 6); //any NUMBER/STRING of arguments can be passed
+            Console.WriteLine("Out value {0}", out_int);
+            Console.WriteLine("Ref value {0}", ref_int);
+
+            //NAMESPACE
+            PAMA.ClassA.Print();
+            PAMB.ClassA.Print();
+
+            //CONSTRUCTORS (static (class.) /instance (obj.) call demo is shown below)
+            SampleConstructorClass obj = new SampleConstructorClass();
+            Console.WriteLine(SampleConstructorClass._Greeting + " " + obj._firstname + " " + obj._lastname);
+        }
+
+        public static void MethodParameters(int i, out int j, ref int k, params int[] numbers)
+        {
+            j = 2;
+            k = 100;
+            Console.WriteLine("Params array value {0}", numbers[3]);
+        }
+
+        public static void StaticMethod()
+        {
+            Console.WriteLine("--------------------------START-------------------------");
             //Console Read/Write
             Console.WriteLine("Enter you name");
             string sName = Console.ReadLine();
@@ -55,7 +93,7 @@ namespace NetCoreCsharpConsoleApp
             Console.WriteLine("Integer to String using Parse {0}", intstr);
 
             //TryParse
-            string strintg = "100";
+            string strintg = "100AB";
             int oInt;
             bool result = int.TryParse(strintg, out oInt);
             Console.WriteLine("Result {0} : Integer {1}", result, oInt);
@@ -121,13 +159,38 @@ namespace NetCoreCsharpConsoleApp
                     continue;
                 Console.Write(k + "\t");
             }
+            Console.WriteLine("--------------------------END-------------------------");
         }
+
+        public void InstanceMethod()
+        {
+            Console.WriteLine("Instance method call");
+        }
+
     }
 
     /// <summary>
-    /// This is my comment
+    /// This is RUBENS CONSTRUCTOR's SAMPLE
     /// </summary>
-    public class SampleClass
+    public class SampleConstructorClass
     {
+        public static string _Greeting = "Hello"; //kept as static since salutation is common & will save memory if declared as static
+        public string _firstname;
+        public string _lastname;
+        public SampleConstructorClass() : this("No First Name", "No Last Name")
+        {
+          
+        }
+
+        public SampleConstructorClass(string FN, string LN)
+        { 
+            this._firstname = FN;
+            this._lastname = LN;
+        }
+
+        ~SampleConstructorClass()
+        {
+            //Clean up code
+        }
     }
 }

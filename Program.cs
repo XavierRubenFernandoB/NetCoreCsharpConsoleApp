@@ -33,6 +33,31 @@ namespace NetCoreCsharpConsoleApp
             //CONSTRUCTORS (static (class.) /instance (obj.) call demo is shown below)
             SampleConstructorClass obj = new SampleConstructorClass();
             Console.WriteLine(SampleConstructorClass._Greeting + " " + obj._firstname + " " + obj._lastname);
+
+            //22. INHERITANCE
+            SampleMultiLevelInheritance der = new SampleMultiLevelInheritance();
+            Console.WriteLine(der._extra);
+
+            //2nd way of calling the base class Print
+            ((SampleDerived)der).Print();
+
+            //3rd way of calling the base class Print
+            SampleDerived baseder = new SampleMultiLevelInheritance(); 
+            baseder.Print();
+
+            //23. POLYMORPHISM
+            SampleBase1[] base1 = new SampleBase1[3];
+            base1[0] = new SampleBase1();
+            base1[1] = new SampleDerived1();
+            base1[2] = new SampleDerived2();//prints from base if either override is not given (OR) if a Print method is not defined.
+            foreach (var item in base1)
+            {
+                item.Print();
+            }
+
+            //24.METHOD OVERRIDING VS METHOD HIDING
+            BaseClass B = new DerivedClass();
+            B.Print();
         }
 
         public static void MethodParameters(int i, out int j, ref int k, params int[] numbers)
@@ -179,11 +204,11 @@ namespace NetCoreCsharpConsoleApp
         public string _lastname;
         public SampleConstructorClass() : this("No First Name", "No Last Name")
         {
-          
+
         }
 
         public SampleConstructorClass(string FN, string LN)
-        { 
+        {
             this._firstname = FN;
             this._lastname = LN;
         }
@@ -193,4 +218,80 @@ namespace NetCoreCsharpConsoleApp
             //Clean up code
         }
     }
+
+    #region INHERITANCE
+
+    class SampleBase
+    {
+        public string _firstname = "FN";
+        public string _lastname = "LN";
+    }
+
+    class SampleDerived : SampleBase
+    {
+        public string _extra = "Derived";
+
+        public void Print()
+        {
+            Console.WriteLine(_firstname + " " + _lastname + ": Derived");
+        }
+    }
+
+    class SampleMultiLevelInheritance : SampleDerived
+    {
+        public new string _extra = "Multi-level";
+
+        public new void Print()
+        {
+            base.Print();       //1st way of calling the base class Print
+            Console.WriteLine(_firstname + " " + _lastname + " " + ": Multi-level");
+        }
+    }
+
+    #endregion
+
+    #region POLYMORPHISM
+    public class SampleBase1
+    {
+        public virtual void Print()
+        {
+            Console.WriteLine("Print from Base1");
+        }
+    }
+
+    public class SampleDerived1 : SampleBase1
+    {
+        public override void Print()
+        {
+            Console.WriteLine("Print from Derived 1");
+        }
+    }
+
+    public class SampleDerived2 : SampleBase1
+    {
+        //public void Print()
+        //{
+        //    Console.WriteLine("Print from Derived 2");
+        //}
+    }
+    #endregion
+
+    #region METHOD OVERRIDING VS METHOD HIDING
+    public class BaseClass
+    {
+        public virtual void Print()
+        {
+            Console.WriteLine("Base Class print");
+        }
+    }
+
+    public class DerivedClass : BaseClass
+    {
+        public new void Print()
+        {
+            Console.WriteLine("Derived Class print");
+        }
+    }
+    #endregion
+
 }

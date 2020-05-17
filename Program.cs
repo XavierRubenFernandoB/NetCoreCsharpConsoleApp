@@ -82,7 +82,7 @@ namespace NetCoreCsharpConsoleApp
             SampleProperties oprop = new SampleProperties();
             oprop.Name = "Xavier";
             oprop.City = "Toronto";
-            Console.WriteLine("Name {0} City {1}", oprop.Name, oprop. City);
+            Console.WriteLine("Name {0} City {1}", oprop.Name, oprop.City);
             Console.WriteLine("------------------------------------------");
 
             //28,29. STRUCTS
@@ -102,7 +102,7 @@ namespace NetCoreCsharpConsoleApp
             //copy one class into another
             SampleProperties oprop2 = oprop;
             oprop2.City = "New York";
-            Console.WriteLine("Class 1 : Name {0} City {1}", oprop.Name, oprop. City);
+            Console.WriteLine("Class 1 : Name {0} City {1}", oprop.Name, oprop.City);
             Console.WriteLine("Class 2 : Name {0} City {1}", oprop2.Name, oprop2.City);
 
             Console.WriteLine("---------------------------------------");
@@ -121,8 +121,38 @@ namespace NetCoreCsharpConsoleApp
             //ISampleInterface2 imp2 = new ISampleInterface2();
             ISampleInterface2 imp2 = new SampleInterfaceImplement();
             imp2.Print2();
-
             Console.WriteLine("---------------------------------------");
+
+            //31. EXPLICIT INTERFACE
+            Console.WriteLine("---------------EXPLICIT INTERFACE-----------------");
+            SampleExplicitInterface expint = new SampleExplicitInterface();
+            //Way 1 of calling : CALLED BY INTERFACE REFERENCE VARIABLE
+            ((I1)expint).Print();
+            ((I2)expint).Print();
+
+            //Way 2 of calling : CALLED BY INTERFACE REFERENCE VARIABLE
+            I1 i1 = new SampleExplicitInterface();
+            i1.Print();
+            I2 i2 = new SampleExplicitInterface();
+            i2.Print();
+
+            expint.Print();//default implementation (implicit implementation) : CALLED BY CLASS REFERENCE VARIABLE
+            Console.WriteLine("--------------------------------------------------");
+
+            //32. ABSTRACT
+            Console.WriteLine("----------------------ABSTRACT--------------------");
+            SampleImplementAbstractClass abs = new SampleImplementAbstractClass();
+            abs.AbstractPrint();
+            abs.Print();
+            Console.WriteLine("--------------------------------------------------");
+
+            //35. MULTIPLE CLASS INHERITANCE USING INTERFACE
+            Console.WriteLine("----------------------MULTIPLE CLASS INHERITANCE USING INTERFACE--------------------");
+            AB ab = new AB();
+            ab.PrintA();
+            ab.PrintB();
+            Console.WriteLine("------------------------------------------------------------------------------------");
+
         }
 
         public static void MethodParameters(int i, out int j, ref int k, params int[] numbers)
@@ -375,7 +405,7 @@ namespace NetCoreCsharpConsoleApp
             }
             get
             {
-                return string.IsNullOrEmpty(this._Name) ?  "Name cannot be null or empty" : this._Name;
+                return string.IsNullOrEmpty(this._Name) ? "Name cannot be null or empty" : this._Name;
             }
         }
 
@@ -386,7 +416,7 @@ namespace NetCoreCsharpConsoleApp
     #endregion
 
     #region STRUCT
-    public struct SampleStruct 
+    public struct SampleStruct
     {
         public string _Name { get; set; }
         public int Age { get; set; }
@@ -426,6 +456,106 @@ namespace NetCoreCsharpConsoleApp
             Console.WriteLine("Interface Print 2 method called");
         }
     }
+    #endregion
+
+    #region EXPLICIT INTERFACE
+    interface I1
+    {
+        void Print();
+    }
+
+    interface I2
+    {
+        void Print();
+    }
+
+    interface I3 //to exhibit default implementation (mixture of explicit & implicit implementation)
+    {
+        void Print();
+    }
+
+    class SampleExplicitInterface : I1, I2, I3
+    {
+        void I1.Print()
+        {
+            Console.WriteLine("Print from I1");
+        }
+
+        void I2.Print()
+        {
+            Console.WriteLine("Print from I2");
+
+        }
+
+        public void Print()
+        {
+            Console.WriteLine("Print from I3");
+        }
+    }
+    #endregion
+
+    #region ABSTRACT
+    public abstract class SampleAbstractClass
+    {
+        public abstract void AbstractPrint();
+
+        public void Print()
+        {
+            Console.WriteLine("Print from NormalPrint method");
+        }
+    }
+
+    public class SampleImplementAbstractClass : SampleAbstractClass
+    {
+        public override void AbstractPrint()
+        {
+            Console.WriteLine("Print from AbstractPrint method");
+        }
+    }
+    #endregion
+
+    #region MULTIPLE CLASS INHERITANCE USING INTERFACE
+
+    interface IA
+    {
+        void PrintA();
+    }
+    public class A : IA
+    {
+        public void PrintA()
+        {
+            Console.WriteLine("A");
+        }
+    }
+
+    interface IB
+    {
+        void PrintB();
+    }
+    public class B : IB
+    {
+        public void PrintB()
+        {
+            Console.WriteLine("B");
+        }
+    }
+
+    class AB : IA, IB
+    {
+        A a = new A();
+        B b = new B();
+       
+        public void PrintA()
+        {
+            a.PrintA();
+        }
+
+        public void PrintB()
+        {
+            b.PrintB();
+        }
+    }
+
     #endregion
 
 }

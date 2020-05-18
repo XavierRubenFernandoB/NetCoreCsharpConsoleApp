@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualBasic.CompilerServices;
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using PAMA = ProjectA.ModuleA;
@@ -153,6 +154,46 @@ namespace NetCoreCsharpConsoleApp
             ab.PrintB();
             Console.WriteLine("------------------------------------------------------------------------------------");
 
+            //36. DELEGATE
+            Console.WriteLine("----------------------DELEGATE--------------------");
+            MyDelegate mydelegate = new MyDelegate(DelegateMethod);
+            DelegateMethod("Hello Delegate");
+            Console.WriteLine("--------------------------------------------------");
+
+            //37,38 WHY DELEGATES
+            Console.WriteLine("---------------------- WHY DELEGATES---------------------");
+            //WITHOUT DELEGATES
+            List<Employee> myEmpList = new List<Employee>();
+            myEmpList.Add(new Employee { Name = "Xavier", Experience = 15});
+            myEmpList.Add(new Employee { Name = "Calvyn", Experience = 1 });
+
+            Employee emp = new Employee();
+            emp.PromoteEmployee(myEmpList);
+
+            //WITH DELEGATES
+            List<Employee1> myEmpList1 = new List<Employee1>();
+            myEmpList1.Add(new Employee1 { Name = "Xavier", Experience = 15 });
+            myEmpList1.Add(new Employee1 { Name = "Calvyn", Experience = 1 });
+
+            IsPromotable isPromotable = new IsPromotable(Promote);
+            Employee1.PromoteEmployee(myEmpList1, isPromotable);
+
+            Console.WriteLine("---------------------------------------------------------");
+
+            //39. MULTICAST DELEGATES
+            Console.WriteLine("----------------------MULTICAST DELEGATES---------------------");
+            dMultiCastDelegate dmulti1 = new dMultiCastDelegate(Method1);
+            dMultiCastDelegate dmulti2 = new dMultiCastDelegate(Method2);
+            dMultiCastDelegate dmulti3 = dmulti1 + dmulti2 - dmulti1;
+            dmulti3();
+
+            dMultiCastDelegate dmulti11 = new dMultiCastDelegate(Method1);
+            dmulti11 += Method2;
+            dmulti11 += Method3;
+            dmulti11 -= Method2;
+            dmulti11();
+
+            Console.WriteLine("--------------------------------------------------------------");
         }
 
         public static void MethodParameters(int i, out int j, ref int k, params int[] numbers)
@@ -285,6 +326,34 @@ namespace NetCoreCsharpConsoleApp
         public void InstanceMethod()
         {
             Console.WriteLine("Instance method call");
+        }
+
+        //36. DELEGATE
+        public static void DelegateMethod(string input)
+        {
+            Console.WriteLine(input);
+        }
+
+        //37,38 WHY DELEGATES
+        public static bool Promote(Employee1 employee1)
+        {
+            return employee1.Experience > 5 ? true : false;
+        }
+
+        //39. MULTICAST DELEGATES
+        public static void Method1()
+        {
+            Console.WriteLine("Method 1");
+        }
+
+        public static void Method2()
+        {
+            Console.WriteLine("Method 2");
+        }
+
+        public static void Method3()
+        {
+            Console.WriteLine("Method 3");
         }
 
     }
@@ -544,7 +613,7 @@ namespace NetCoreCsharpConsoleApp
     {
         A a = new A();
         B b = new B();
-       
+
         public void PrintA()
         {
             a.PrintA();
@@ -553,6 +622,75 @@ namespace NetCoreCsharpConsoleApp
         public void PrintB()
         {
             b.PrintB();
+        }
+    }
+
+    #endregion
+
+    #region DELEGATES
+
+    public delegate void MyDelegate(string input);
+
+    #endregion
+
+    #region WHY DELEGATES
+
+    //WITHOUT DELEGATES
+    public class Employee
+    {
+        public string Name{ get; set; }
+        public int Experience { get; set; }
+
+        public void PromoteEmployee(List<Employee> employee)
+        {
+            foreach (var emp in employee)
+            {
+                if (emp.Experience > 5)
+                {
+                    Console.WriteLine("Employee {0} is promoted", emp.Name);
+                }
+            }
+        }
+    }
+
+    //WITH DELEGATES
+    public delegate bool IsPromotable(Employee1 emp);
+    public class Employee1
+    {
+        public string Name { get; set; }
+        public int Experience { get; set; }
+
+        public static void PromoteEmployee(List<Employee1> employee1, IsPromotable isPromotable)
+        {
+            foreach (var emp1 in employee1)
+            {
+                if (isPromotable(emp1))
+                {
+                    Console.WriteLine("Employee {0} is promoted", emp1.Name);
+                }
+            }
+        }
+    }
+
+    #endregion
+
+    #region MULTICAST DELEGATES
+    public delegate void dMultiCastDelegate();
+    public class SampleMultiCastDelegates
+    {
+        public static void Method1()
+        {
+            Console.WriteLine("Method 1");
+        }
+
+        public static void Method2()
+        {
+            Console.WriteLine("Method 2");
+        }
+
+        public static void Method3()
+        {
+            Console.WriteLine("Method 3");
         }
     }
 

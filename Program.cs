@@ -5,10 +5,14 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using PAMA = ProjectA.ModuleA;
 using PAMB = ProjectA.ModuleB;
+using System.IO;
+using System.Runtime.Serialization;
+using System.Net.Http;
 
 namespace NetCoreCsharpConsoleApp
 {
     class Program
+
     {
         static void Main(string[] args)
         {
@@ -164,7 +168,7 @@ namespace NetCoreCsharpConsoleApp
             Console.WriteLine("---------------------- WHY DELEGATES---------------------");
             //WITHOUT DELEGATES
             List<Employee> myEmpList = new List<Employee>();
-            myEmpList.Add(new Employee { Name = "Xavier", Experience = 15});
+            myEmpList.Add(new Employee { Name = "Xavier", Experience = 15 });
             myEmpList.Add(new Employee { Name = "Calvyn", Experience = 1 });
 
             Employee emp = new Employee();
@@ -194,6 +198,22 @@ namespace NetCoreCsharpConsoleApp
             dmulti11();
 
             Console.WriteLine("--------------------------------------------------------------");
+
+            //40,41. EXCEPTION HANDLING
+            Console.WriteLine("--------------------EXCEPTION HANDLING-----------------------");
+            ExceptionHandling();
+
+            Console.WriteLine("-------------CUSTOM EXCEPTION HANDLING-----------------------");
+            //42. CUSTOM EXCEPTION HANDLING
+            CustomeExceptionHandling();
+
+            Console.WriteLine("-------------ENUMS-----------------------");
+            //45,46,47. enums,Enums
+            EnumSample();
+
+            Console.WriteLine("-------------TYPES & TYPE MEMBERS-----------------------");
+            //48. Types & Type members
+            TypeAndTypeMembers();
         }
 
         public static void MethodParameters(int i, out int j, ref int k, params int[] numbers)
@@ -356,11 +376,109 @@ namespace NetCoreCsharpConsoleApp
             Console.WriteLine("Method 3");
         }
 
+        //40,41 EXCEPTION HANDLING & INNER EXCEPTION
+        static void ExceptionHandling()
+        {
+            try
+            {
+                StreamReader sr = null;
+                StreamWriter sw = null;
+                try
+                {
+                    int i = 10;
+                    int j = 0;
+                    int k = i / j;
+                }
+                catch (Exception ex)//Divide by Zero exception caught
+                {
+                    string sPath = @"D:\Home\Ruben\Work\C#\MyText1.txt";
+                    if (File.Exists(sPath))//Make File Exception to be caught
+                    {
+                        sr = new StreamReader(@"D:\Home\Ruben\Work\C#\MyText1.txt");
+                        Console.WriteLine(sr.ReadToEnd());
+                    }
+                    else
+                    {
+                        throw new FileNotFoundException("File Not Found", ex); // STATEMENT1 : PASS AS INNER EXCEPTION PARAMETER TO THE CONSTRUCTOR
+                    }
+                }
+                finally
+                {
+                    if (sr != null)
+                    {
+                        sr.Close();
+                    }
+                    if (sw != null)
+                    {
+                        sw.Close();
+                    }
+                    Console.WriteLine("finally executed");
+                }
+            }
+            catch (Exception final_ex)
+            {
+                //FILE NOT FOUND EXCEPTION
+                Console.WriteLine(final_ex.GetType().Name);
+
+                //DIVIDE BY ZERO EXCEPTION : SET AT "STATEMENT1" : ex is the divide by zero exception
+                if (final_ex.InnerException != null)
+                    Console.WriteLine(final_ex.InnerException.GetType().Name);
+            }
+        }
+
+        //42. CUSTOM EXCEPTION HANDLING
+        static void CustomeExceptionHandling()
+        {
+            try
+            {
+                try
+                {
+                    int i = 10;
+                    int j = 0;
+                    int k = i / j;
+                }
+                catch (Exception ex)
+                {
+                    //code something that throws your custom exception
+                    throw new MyCustomExcetpion("This is my own custom exception", ex);
+                }
+            }
+            catch (Exception finalex)
+            {
+                Console.WriteLine(finalex.GetType());
+                Console.WriteLine(finalex.InnerException.GetType());
+            }
+        }
+
+        //45,46,47. enums,Enums
+        static void EnumSample()
+        {
+            //Read enum Names using Enum Class
+            string[] GenderNames = (string[])Enum.GetNames(typeof(Gender));
+            Console.WriteLine(GenderNames[0]);
+
+            //Read enum Values using Enum Class
+            int[] GenderValues = (int[])Enum.GetValues(typeof(Gender));
+            Console.WriteLine(GenderValues[0]);
+        }
+
+        //48. Type and Type members
+        static void TypeAndTypeMembers()
+        {
+            SampleProtected sampleProtected = new SampleProtected();
+            sampleProtected.GetSetProtected();
+            Console.WriteLine("Internal value is {0}", sampleProtected.d);
+
+            SampleProtectedInternal sampleProtectedInternal = new SampleProtectedInternal();
+            sampleProtectedInternal.GetSetProtectedInternal();
+        }
     }
 
     /// <summary>
     /// This is RUBENS CONSTRUCTOR's SAMPLE
     /// </summary>
+    /// 
+    #region CONSTRUCTOR
     public class SampleConstructorClass
     {
         public static string _Greeting = "Hello"; //kept as static since salutation is common & will save memory if declared as static
@@ -382,6 +500,8 @@ namespace NetCoreCsharpConsoleApp
             //Clean up code
         }
     }
+
+    #endregion
 
     #region INHERITANCE
 
@@ -638,7 +758,7 @@ namespace NetCoreCsharpConsoleApp
     //WITHOUT DELEGATES
     public class Employee
     {
-        public string Name{ get; set; }
+        public string Name { get; set; }
         public int Experience { get; set; }
 
         public void PromoteEmployee(List<Employee> employee)
@@ -694,6 +814,89 @@ namespace NetCoreCsharpConsoleApp
         }
     }
 
+    #endregion
+
+    #region CUSTOM EXCEPTION HANDLING
+
+    [Serializable]
+    public class MyCustomExcetpion : Exception
+    {
+        public MyCustomExcetpion() : base()
+        {
+            Console.WriteLine("Custom exception constructor called");
+        }
+
+        public MyCustomExcetpion(string message) : base(message)
+        {
+        }
+
+        public MyCustomExcetpion(string message, Exception innerexception) : base(message, innerexception)
+        {
+
+        }
+
+        public MyCustomExcetpion(SerializationInfo serializeinfo, StreamingContext streamcontext) : base(serializeinfo, streamcontext)
+        {
+
+        }
+    }
+
+    #endregion
+
+    #region enums,Enums
+    public enum Gender
+    {
+        Male = 5,
+        Female = 10,
+        TransGender = 15
+    }
+    #endregion
+
+    #region Types & Type members
+    public class Customer
+    {
+        private int a = 1;
+        public int b = 10;
+        protected int c = 100;
+        internal int d = 1000;
+        //protected internal e;
+    }
+
+    internal class Customer1
+    {
+        private int a;
+        public int b;
+        protected int c;
+        internal int d;
+    }
+
+    //PROTECTED
+    public class SampleProtected : Customer
+    {
+        public void GetSetProtected()
+        {
+            //Way 1 to access
+            SampleProtected obj = new SampleProtected();
+            Console.WriteLine(obj.c);//protected
+            this.c = 10;
+            //Way 2 to access
+            Console.WriteLine(this.c);//protected
+            //Way 3 to access
+            Console.WriteLine(base.c);//protected
+        }
+    }
+
+    //PROTECTED INTERNAL
+    public class SampleProtectedInternal : PAMA.ClassA
+    {
+        public void GetSetProtectedInternal()
+        {
+            SampleProtectedInternal obj = new SampleProtectedInternal();
+            Console.WriteLine("Protected internal value is {0}", obj.myint);//protected internal
+            base.myint = 200;
+            Console.WriteLine("Protected internal value now is {0}", this.myint); //different ways of get/set -> obj,base,this
+        }
+    }
     #endregion
 
 }

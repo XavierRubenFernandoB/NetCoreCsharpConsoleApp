@@ -8,6 +8,7 @@ using PAMB = ProjectA.ModuleB;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Net.Http;
+using System.Reflection;
 
 namespace NetCoreCsharpConsoleApp
 {
@@ -19,13 +20,11 @@ namespace NetCoreCsharpConsoleApp
             //STATIC METHOD
             Console.WriteLine("---------------STATIC METHOD-----------------");
             //Program.StaticMethod(); //commented to avoid junk display
-            Console.WriteLine("---------------------------------------------");
 
             //INSTANCE METHOD
             Console.WriteLine("---------------INSTANCE METHOD-----------------");
             Program p = new Program();
             p.InstanceMethod();
-            Console.WriteLine("-----------------------------------------------");
 
             //METHOD PARAMETERS
             Console.WriteLine("---------------METHOD PARAMETERS-----------------");
@@ -35,19 +34,16 @@ namespace NetCoreCsharpConsoleApp
             Program.MethodParameters(1, out out_int, ref ref_int, 1, 2, 3, 4, 5, 6); //any NUMBER/STRING of arguments can be passed
             Console.WriteLine("Out value {0}", out_int);
             Console.WriteLine("Ref value {0}", ref_int);
-            Console.WriteLine("-------------------------------------------------");
 
             //NAMESPACE
             Console.WriteLine("---------------NAMESPACE-----------------");
             PAMA.ClassA.Print();
             PAMB.ClassA.Print();
-            Console.WriteLine("--------------------------------------------");
 
             //CONSTRUCTORS (static (class.) /instance (obj.) call demo is shown below)
             Console.WriteLine("---------------CONSTRUCTORS-----------------");
             SampleConstructorClass obj = new SampleConstructorClass();
             Console.WriteLine(SampleConstructorClass._Greeting + " " + obj._firstname + " " + obj._lastname);
-            Console.WriteLine("--------------------------------------------");
 
             //22. INHERITANCE
             Console.WriteLine("---------------INHERITANCE-----------------");
@@ -60,7 +56,6 @@ namespace NetCoreCsharpConsoleApp
             //3rd way of calling the base class Print
             SampleDerived baseder = new SampleMultiLevelInheritance();
             baseder.Print();
-            Console.WriteLine("--------------------------------------------");
 
             //23. POLYMORPHISM
             Console.WriteLine("---------------POLYMORPHISM-----------------");
@@ -72,13 +67,11 @@ namespace NetCoreCsharpConsoleApp
             {
                 item.Print();
             }
-            Console.WriteLine("--------------------------------------------");
 
             //24.METHOD OVERRIDING VS METHOD HIDING
             Console.WriteLine("---------------METHOD OVERRIDING VS METHOD HIDING-----------------");
             BaseClass B = new DerivedClass();
             B.Print();
-            Console.WriteLine("------------------------------------------------------------------");
 
             //25.METHOD OVERLOADING : Return Type & Params cannot be considered in the signature of a method during overloading
 
@@ -88,7 +81,6 @@ namespace NetCoreCsharpConsoleApp
             oprop.Name = "Xavier";
             oprop.City = "Toronto";
             Console.WriteLine("Name {0} City {1}", oprop.Name, oprop.City);
-            Console.WriteLine("------------------------------------------");
 
             //28,29. STRUCTS
             Console.WriteLine("---------------STRUCTS-----------------");
@@ -110,8 +102,6 @@ namespace NetCoreCsharpConsoleApp
             Console.WriteLine("Class 1 : Name {0} City {1}", oprop.Name, oprop.City);
             Console.WriteLine("Class 2 : Name {0} City {1}", oprop2.Name, oprop2.City);
 
-            Console.WriteLine("---------------------------------------");
-
             //30. INTERFACE
             Console.WriteLine("---------------INTERFACE-----------------");
             SampleInterfaceImplement imp = new SampleInterfaceImplement();
@@ -126,7 +116,6 @@ namespace NetCoreCsharpConsoleApp
             //ISampleInterface2 imp2 = new ISampleInterface2();
             ISampleInterface2 imp2 = new SampleInterfaceImplement();
             imp2.Print2();
-            Console.WriteLine("---------------------------------------");
 
             //31. EXPLICIT INTERFACE
             Console.WriteLine("---------------EXPLICIT INTERFACE-----------------");
@@ -142,27 +131,23 @@ namespace NetCoreCsharpConsoleApp
             i2.Print();
 
             expint.Print();//default implementation (implicit implementation) : CALLED BY CLASS REFERENCE VARIABLE
-            Console.WriteLine("--------------------------------------------------");
 
             //32. ABSTRACT
             Console.WriteLine("----------------------ABSTRACT--------------------");
             SampleImplementAbstractClass abs = new SampleImplementAbstractClass();
             abs.AbstractPrint();
             abs.Print();
-            Console.WriteLine("--------------------------------------------------");
 
             //35. MULTIPLE CLASS INHERITANCE USING INTERFACE
             Console.WriteLine("----------------------MULTIPLE CLASS INHERITANCE USING INTERFACE--------------------");
             AB ab = new AB();
             ab.PrintA();
             ab.PrintB();
-            Console.WriteLine("------------------------------------------------------------------------------------");
 
             //36. DELEGATE
             Console.WriteLine("----------------------DELEGATE--------------------");
             MyDelegate mydelegate = new MyDelegate(DelegateMethod);
             DelegateMethod("Hello Delegate");
-            Console.WriteLine("--------------------------------------------------");
 
             //37,38 WHY DELEGATES
             Console.WriteLine("---------------------- WHY DELEGATES---------------------");
@@ -182,7 +167,6 @@ namespace NetCoreCsharpConsoleApp
             IsPromotable isPromotable = new IsPromotable(Promote);
             Employee1.PromoteEmployee(myEmpList1, isPromotable);
 
-            Console.WriteLine("---------------------------------------------------------");
 
             //39. MULTICAST DELEGATES
             Console.WriteLine("----------------------MULTICAST DELEGATES---------------------");
@@ -211,9 +195,26 @@ namespace NetCoreCsharpConsoleApp
             //45,46,47. enums,Enums
             EnumSample();
 
-            Console.WriteLine("-------------TYPES & TYPE MEMBERS-----------------------");
-            //48. Types & Type members
-            TypeAndTypeMembers();
+            Console.WriteLine("-------------ACCESS MODIFIERS - Type members-----------------------");
+            //48. ACCESS MODIFIERS - Type members
+            TypeMembers();
+
+            Console.WriteLine("-------------ACCESS MODIFIERS - Types------------------------------");
+            //51. ACCESS MODIFIERS - Types
+            Types();
+
+            Console.WriteLine("----------------------ATTRIBUTES------------------------------");
+            //52. 
+            oldPrint();
+            newPrint();
+
+            Console.WriteLine("----------------------REFLECTIONS------------------------------");
+            //53. 
+            Reflections();
+
+            Console.WriteLine("----------------------EARLY BINDING Vs LATE BINDING------------------------------");
+            //55. 
+            EarlyVsLateBinding();
         }
 
         public static void MethodParameters(int i, out int j, ref int k, params int[] numbers)
@@ -462,8 +463,8 @@ namespace NetCoreCsharpConsoleApp
             Console.WriteLine(GenderValues[0]);
         }
 
-        //48. Type and Type members
-        static void TypeAndTypeMembers()
+        //48. ACCESS MODIFIERS - Type members
+        static void TypeMembers()
         {
             SampleProtected sampleProtected = new SampleProtected();
             sampleProtected.GetSetProtected();
@@ -472,6 +473,82 @@ namespace NetCoreCsharpConsoleApp
             SampleProtectedInternal sampleProtectedInternal = new SampleProtectedInternal();
             sampleProtectedInternal.GetSetProtectedInternal();
         }
+
+        //51. ACCESS MODIFIERS - Types
+        static void Types()
+        {
+            SampleAMTypes obj = new SampleAMTypes();
+            obj.Print();
+        }
+
+        #region ATTRIBUTES
+        [Obsolete("Use static void newPrint()", false)] //if set as true will compile with errors
+        static void oldPrint()
+        {
+            Console.WriteLine("Print from OLD");
+        }
+
+        static void newPrint()
+        {
+            Console.WriteLine("Print from NEW");
+        }
+        #endregion
+
+        #region REFLECTION
+        static void Reflections()
+        {
+            //Type T = Type.GetType("NetCoreCsharpConsoleApp.SampleReflectionClass");   //Method 1
+
+            Type T = typeof(SampleReflectionClass);                                     //Method 2
+
+            //SampleReflectionClass obj = new SampleReflectionClass();                  //Method 3
+            //Type T = obj.GetType();
+
+            Console.WriteLine(T.FullName);
+            Console.WriteLine("------------PROPERTIES-----------------");
+            PropertyInfo[] properties = T.GetProperties();
+            foreach (PropertyInfo property in properties)
+            {
+                Console.WriteLine(property.PropertyType + " " + property.Name);
+            }
+
+            Console.WriteLine("-------------METHODS-----------------");
+            MethodInfo[] methods = T.GetMethods();
+            foreach (MethodInfo method in methods)
+            {
+                Console.WriteLine(method.Name);
+                if (method.Name == "Print")
+                {
+                    object result = null;
+                    object classInstance = Activator.CreateInstance(T, null);
+                    result = method.Invoke(classInstance, null);
+                }
+            }
+        }
+
+        #endregion
+
+        #region EarlyVsLateBinding
+        static void EarlyVsLateBinding()
+        {
+            //Early Binding
+            BindingCustomer bc = new BindingCustomer();
+            string sFullName = bc.PrintCustomer("Xavier", "Fernando");
+            Console.WriteLine(sFullName);
+
+            //Late Binding (NOT ADVISABLE considering the complexity & performance)
+            Assembly executingassembly = Assembly.GetExecutingAssembly();
+            Type customerType = executingassembly.GetType("NetCoreCsharpConsoleApp.BindingCustomer");
+            object customerInstance = Activator.CreateInstance(customerType);
+            MethodInfo getFullNameMethod = customerType.GetMethod("PrintCustomer");
+
+            string[] parameters = new string[2];
+            parameters[0] = "Xavier";
+            parameters[1] = "Fernando";
+            string sFullName2 = (string)getFullNameMethod.Invoke(customerInstance, parameters);
+            Console.WriteLine(sFullName2);
+        }
+        #endregion
     }
 
     /// <summary>
@@ -852,7 +929,7 @@ namespace NetCoreCsharpConsoleApp
     }
     #endregion
 
-    #region Types & Type members
+    #region ACCESS MODIFIERS - Type members
     public class Customer
     {
         private int a = 1;
@@ -860,14 +937,6 @@ namespace NetCoreCsharpConsoleApp
         protected int c = 100;
         internal int d = 1000;
         //protected internal e;
-    }
-
-    internal class Customer1
-    {
-        private int a;
-        public int b;
-        protected int c;
-        internal int d;
     }
 
     //PROTECTED
@@ -895,6 +964,43 @@ namespace NetCoreCsharpConsoleApp
             Console.WriteLine("Protected internal value is {0}", obj.myint);//protected internal
             base.myint = 200;
             Console.WriteLine("Protected internal value now is {0}", this.myint); //different ways of get/set -> obj,base,this
+        }
+    }
+    #endregion
+
+    #region ACCESS MODIFIERS - Types
+    public class SampleAMTypes
+    {
+        public void Print()
+        {
+            PAMA.ClassB obj = new PAMA.ClassB(); //Class C cannot be accessed because its INTERNAL
+            obj.Print();
+        }
+    }
+    #endregion
+
+    #region REFLECTION
+    public class SampleReflectionClass
+    {
+        private int i;
+        public string s;
+
+        public int myint { get; set; }
+        public string mystring { get; set; }
+
+        public void Print()
+        {
+            Console.WriteLine("Printed successfully by Reflection");
+        }
+    }
+    #endregion
+
+    #region EarlyVsLateBinding
+    public class BindingCustomer
+    {
+        public string PrintCustomer(string FN, string LN)
+        {
+            return FN + " " +  LN;
         }
     }
     #endregion

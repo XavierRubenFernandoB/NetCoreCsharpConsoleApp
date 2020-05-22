@@ -215,6 +215,19 @@ namespace NetCoreCsharpConsoleApp
             Console.WriteLine("----------------------EARLY BINDING Vs LATE BINDING------------------------------");
             //55. 
             EarlyVsLateBinding();
+
+            Console.WriteLine("----------------------GENERICS------------------------------");
+            //56. 
+            Generics();
+
+            Console.WriteLine("----------------------Provide Implemention for ToString()------------------------------");
+            //57,58. 
+            ProvideImplementionForToString();
+
+            Console.WriteLine("----------------------GENERICS------------------------------");
+            //59. 
+            DifferenceBetweenConvertToStringAndToString();
+
         }
 
         public static void MethodParameters(int i, out int j, ref int k, params int[] numbers)
@@ -547,6 +560,54 @@ namespace NetCoreCsharpConsoleApp
             parameters[1] = "Fernando";
             string sFullName2 = (string)getFullNameMethod.Invoke(customerInstance, parameters);
             Console.WriteLine(sFullName2);
+        }
+        #endregion
+
+        #region GENERICS
+        static void Generics()
+        {
+            SampleGenerics obj = new SampleGenerics();
+            //bool result = obj.AreInputsEqual(1, "A"); //gives compilation error
+            bool result = obj.AreInputsEqual("A", "A");
+
+            if (result)
+            {
+                Console.WriteLine("Equal");
+            }
+            else
+            {
+                Console.WriteLine("Not Equal");
+
+            }
+        }
+        #endregion
+
+        #region ProvideImplementionForToString
+
+        static void ProvideImplementionForToString()
+        {
+            CustomerToString cts = new CustomerToString();
+            cts.FirstName = "Xavier";
+            cts.LastName = "Fernando";
+
+            CustomerToString cts2 = new CustomerToString();
+            cts2.FirstName = "Calvyn";
+            cts2.LastName = "Fernando";
+
+            Console.WriteLine(cts.ToString());
+            Console.WriteLine(cts.Equals(cts2));
+            Console.WriteLine(cts.GetHashCode());
+        }
+
+        #endregion
+
+        #region DifferenceBetweenConvertToStringAndToString
+        static void DifferenceBetweenConvertToStringAndToString()
+        {
+            string s = "TestString";
+            s = null;
+            //Console.WriteLine(s.ToString()); // WILL THROW ERROR
+            Console.Write(Convert.ToString(s));
         }
         #endregion
     }
@@ -1000,9 +1061,57 @@ namespace NetCoreCsharpConsoleApp
     {
         public string PrintCustomer(string FN, string LN)
         {
-            return FN + " " +  LN;
+            return FN + " " + LN;
         }
     }
+    #endregion
+
+    #region GENERICS
+
+    public class SampleGenerics
+    {
+        public bool AreInputsEqual<T>(T a, T b)
+        {
+            return a.Equals(b);
+        }
+    }
+
+    #endregion
+
+    #region ProvideImplementionForToString
+
+    public class CustomerToString
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+
+        public override string ToString()
+        {
+            //return base.ToString();
+            return LastName + " " + FirstName;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null)
+            {
+                return false;
+            }
+
+            if (!(obj is Customer))
+            {
+                return false;
+            }
+
+            return this.FirstName == ((CustomerToString)obj).FirstName && this.LastName == ((CustomerToString)obj).LastName;
+        }
+
+        public override int GetHashCode()
+        {
+            return FirstName.GetHashCode() ^ LastName.GetHashCode();
+        }
+    }
+
     #endregion
 
 }

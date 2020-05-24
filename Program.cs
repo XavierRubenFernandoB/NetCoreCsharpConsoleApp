@@ -11,6 +11,8 @@ using System.Net.Http;
 using System.Reflection;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.ComponentModel.DataAnnotations;
+using System.Reflection.Metadata.Ecma335;
 
 namespace NetCoreCsharpConsoleApp
 {
@@ -239,6 +241,10 @@ namespace NetCoreCsharpConsoleApp
             Console.WriteLine("----------------------MAKING METHOD PARAMETERS OPTIONAL------------------------------");
             //67-70 
             SampleMethodParametersOptional();
+
+            Console.WriteLine("--------------DICTIONARY-----------------");
+            //71
+            SampleDictionary();
         }
 
         public static void MethodParameters(int i, out int j, ref int k, params int[] numbers)
@@ -648,9 +654,85 @@ namespace NetCoreCsharpConsoleApp
             Console.WriteLine(NetCoreCsharpConsoleApp.SampleMethodParametersOptional.MyOptionalMethod2(10, 20));
             Console.WriteLine(NetCoreCsharpConsoleApp.SampleMethodParametersOptional.MyOptionalMethod3(10, 20));
             Console.WriteLine(NetCoreCsharpConsoleApp.SampleMethodParametersOptional.MyOptionalMethod4(10, 20));
-            Console.WriteLine(NetCoreCsharpConsoleApp.SampleMethodParametersOptional.MyOptionalMethod5(10, c:50));
+            Console.WriteLine(NetCoreCsharpConsoleApp.SampleMethodParametersOptional.MyOptionalMethod5(10, c: 50));
         }
 
+        #endregion
+
+        #region DICTIONARY
+        static void SampleDictionary()
+        {
+            //DECLARE
+            Dictionary<int, Customr> customrDict = new Dictionary<int, Customr>();
+
+            //INITIALIZE
+            customrDict.Add(100, new Customr() { EmpID = 100, Name = "Xavier", Salary = 1000000 });
+            customrDict.Add(101, new Customr() { EmpID = 101, Name = "Madhu", Salary = 500000 });
+            customrDict.Add(102, new Customr() { EmpID = 102, Name = "Calvyn", Salary = 400000 });
+
+            //READ USING A KEY
+            if (customrDict.ContainsKey(100))
+            {
+                Customr firstcust = customrDict[100];
+                Console.WriteLine("Key is {0}", firstcust.EmpID);
+            }
+
+            //LOOP THE DICTIONARY USING KEY VALUE PAIR
+            foreach (KeyValuePair<int, Customr> custkeyvaluepair in customrDict)
+            {
+                Console.WriteLine("Key is {0}", custkeyvaluepair.Key);
+                Customr eachcustomer = custkeyvaluepair.Value;
+                Console.WriteLine("Value is {0}, {1}, {2}", eachcustomer.EmpID, eachcustomer.Name, eachcustomer.Salary);
+            }
+
+            //LOOP THE DICTIONARY USING KEY 
+            foreach (int custkey in customrDict.Keys)
+            {
+                Console.WriteLine("Key is {0}", custkey);
+            }
+
+            //LOOP THE DICTIONARY USING VALUE
+            foreach (Customr cust in customrDict.Values)
+            {
+                Console.WriteLine("Value is {0}, {1}, {2}", cust.EmpID, cust.Name, cust.Salary);
+            }
+
+            //Use TRYGETVALUE & Remove a key
+            Customr getcust;
+            if (customrDict.TryGetValue(100, out getcust))
+            {
+                customrDict.Remove(100);
+            }
+
+            //GET COUNT & count based on condition of value
+            Console.WriteLine("Total Count = {0}", customrDict.Count);
+            Console.WriteLine("Salary >400000 count = {0}", customrDict.Count(a => a.Value.Salary > 400000));
+
+            //CLEAR the dictionary
+            customrDict.Clear();
+            Console.WriteLine("Total Count = {0}", customrDict.Count);
+
+            //Convert ARRAY, LIST into a Dictionary
+            Customr[] custarray = new Customr[3];
+            custarray[0] = new Customr { EmpID = 1000, Name = "John", Salary = 1000 };
+            custarray[1] = new Customr { EmpID = 1001, Name = "Pam", Salary = 2000 };
+            custarray[2] = new Customr { EmpID = 1002, Name = "Kim", Salary = 3000 };
+
+            List<Customr> custlist = new List<Customr>();
+            custlist.Add(new Customr { EmpID = 1000, Name = "John", Salary = 1000 });
+            custlist.Add(new Customr { EmpID = 1001, Name = "Pam", Salary = 2000 });
+            custlist.Add(new Customr { EmpID = 1002, Name = "Kim", Salary = 3000 });
+
+            //Dictionary<int, Customr> newdict = custarray.ToDictionary(cust => cust.EmpID, cust => cust);
+            Dictionary<int, Customr> newdict = custlist.ToDictionary(cust => cust.EmpID, cust => cust);
+
+            foreach (KeyValuePair<int, Customr> custkeyvaluepair in newdict)
+            {
+                Console.WriteLine("Key is {0}", custkeyvaluepair.Key);
+                Customr eachcustomer = custkeyvaluepair.Value;
+                Console.WriteLine("Value is {0}, {1}, {2}", eachcustomer.EmpID, eachcustomer.Name, eachcustomer.Salary);
+            }
+        }
         #endregion
     }
 
@@ -1285,5 +1367,14 @@ namespace NetCoreCsharpConsoleApp
         }
     }
 
+    #endregion
+
+    #region DICTIONARY
+    public class Customr
+    {
+        public int EmpID { get; set; }
+        public string Name { get; set; }
+        public int Salary { get; set; }
+    }
     #endregion
 }

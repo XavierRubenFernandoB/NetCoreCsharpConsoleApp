@@ -9,6 +9,8 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Net.Http;
 using System.Reflection;
+using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace NetCoreCsharpConsoleApp
 {
@@ -224,10 +226,19 @@ namespace NetCoreCsharpConsoleApp
             //57,58. 
             ProvideImplementionForToString();
 
-            Console.WriteLine("----------------------GENERICS------------------------------");
+            Console.WriteLine("--------------------DifferenceBetweenConvertToStringAndToString-------------------");
             //59. 
             DifferenceBetweenConvertToStringAndToString();
 
+            //CHECK FOR PARTIAL CLASSES AT NetCoreCsharpWebApp  (61,62,63)
+
+            Console.WriteLine("----------------------INDEXERS & OVERLOADED INDEXERS------------------------------");
+            //65,66. 
+            SampleIndexeres();
+
+            Console.WriteLine("----------------------MAKING METHOD PARAMETERS OPTIONAL------------------------------");
+            //67-70 
+            SampleMethodParametersOptional();
         }
 
         public static void MethodParameters(int i, out int j, ref int k, params int[] numbers)
@@ -607,8 +618,39 @@ namespace NetCoreCsharpConsoleApp
             string s = "TestString";
             s = null;
             //Console.WriteLine(s.ToString()); // WILL THROW ERROR
-            Console.Write(Convert.ToString(s));
+            Console.WriteLine(Convert.ToString(s));
         }
+        #endregion
+
+        #region INDEXERS, OVERLOADING INDEXERS
+
+        static void SampleIndexeres()
+        {
+            IndexerCompany company = new IndexerCompany();
+            Console.WriteLine(company[1]); //before change
+            company[1] = "Ruben";
+            Console.WriteLine(company[1]); //after change
+
+            IndexerCompany company1 = new IndexerCompany();
+            Console.WriteLine(company1[1, "Executive"]);     //calling overloaded indexers
+
+            Console.WriteLine(company1["IT"]);
+            company1["IT"] = "Doggies";
+            Console.WriteLine(company1["Doggies"]);
+        }
+        #endregion
+
+        #region SampleMethodParametersOptional
+
+        static void SampleMethodParametersOptional()
+        {
+            Console.WriteLine(NetCoreCsharpConsoleApp.SampleMethodParametersOptional.MyOptionalMethod1(10, 20, 1, 2, 3, 4, 5));
+            Console.WriteLine(NetCoreCsharpConsoleApp.SampleMethodParametersOptional.MyOptionalMethod2(10, 20));
+            Console.WriteLine(NetCoreCsharpConsoleApp.SampleMethodParametersOptional.MyOptionalMethod3(10, 20));
+            Console.WriteLine(NetCoreCsharpConsoleApp.SampleMethodParametersOptional.MyOptionalMethod4(10, 20));
+            Console.WriteLine(NetCoreCsharpConsoleApp.SampleMethodParametersOptional.MyOptionalMethod5(10, c:50));
+        }
+
         #endregion
     }
 
@@ -1114,4 +1156,134 @@ namespace NetCoreCsharpConsoleApp
 
     #endregion
 
+    #region INDEXERS, OVERLOADING INDEXERS
+
+    public class IndexerEmployee
+    {
+        public int EmpId { get; set; }
+        public string Name { get; set; }
+        public string Dept { get; set; }
+    }
+    public class IndexerCompany
+    {
+        private List<IndexerEmployee> lstcustomers;
+
+        public IndexerCompany()
+        {
+            lstcustomers = new List<IndexerEmployee>();
+            lstcustomers.Add(new IndexerEmployee() { EmpId = 1, Name = "Xavier", Dept = "Executive" });
+            lstcustomers.Add(new IndexerEmployee() { EmpId = 2, Name = "Madhu", Dept = "HR" });
+            lstcustomers.Add(new IndexerEmployee() { EmpId = 3, Name = "Calvyn", Dept = "HR" });
+            lstcustomers.Add(new IndexerEmployee() { EmpId = 4, Name = "Snowy", Dept = "IT" });
+            lstcustomers.Add(new IndexerEmployee() { EmpId = 5, Name = "Bubble", Dept = "IT" });
+            lstcustomers.Add(new IndexerEmployee() { EmpId = 6, Name = "Waffer", Dept = "IT" });
+        }
+
+        public string this[int employeeid]
+        {
+            get
+            {
+                return lstcustomers.FirstOrDefault(x => x.EmpId == employeeid).Name;
+            }
+            set
+            {
+                lstcustomers.FirstOrDefault(x => x.EmpId == employeeid).Name = value;
+            }
+        }
+
+        //INDEXER OVERLOADING
+        public string this[int employeeid, string department]
+        {
+            get
+            {
+                return lstcustomers.FirstOrDefault(x => x.EmpId == employeeid && x.Dept == department).Name;
+            }
+            set
+            {
+                lstcustomers.FirstOrDefault(x => x.EmpId == employeeid && x.Dept == department).Name = value;
+            }
+        }
+
+        //GET THE COUNT BEFORE UPDATE & THEN 
+        public string this[string department]
+        {
+            get
+            {
+                return lstcustomers.Count(x => x.Dept == department).ToString();
+            }
+            set
+            {
+                foreach (var item in lstcustomers)
+                {
+                    if (item.Dept == department)
+                    {
+                        item.Dept = value;
+                    }
+                }
+            }
+        }
+    }
+
+    #endregion
+
+    #region SampleMethodParametersOptional
+
+    public class SampleMethodParametersOptional
+    {
+        public static int MyOptionalMethod1(int a, int b, params object[] restofNumbers)
+        {
+            int result;
+            result = a + b;
+            if (restofNumbers != null)
+            {
+                foreach (object item in restofNumbers)
+                {
+                    result += (int)item;
+                }
+            }
+            return result;
+        }
+
+        public static int MyOptionalMethod2(int a, int b)
+        {
+            return MyOptionalMethod1(a, b, null);
+        }
+
+        public static int MyOptionalMethod3(int a, int b, int[] restofNumbers = null)
+        {
+            int result;
+            result = a + b;
+            if (restofNumbers != null)
+            {
+                foreach (object item in restofNumbers)
+                {
+                    result += (int)item;
+                }
+            }
+            return result;
+        }
+
+        public static int MyOptionalMethod4(int a, int b, [OptionalAttribute] int[] restofNumbers)
+        {
+            int result;
+            result = a + b;
+            if (restofNumbers != null)
+            {
+                foreach (object item in restofNumbers)
+                {
+                    result += (int)item;
+                }
+            }
+            return result;
+        }
+
+        public static int MyOptionalMethod5(int a, int b = 10, int c = 20)
+        {
+            int result;
+            result = a + b + c;
+            return result;
+        }
+    }
+
+    #endregion
 }

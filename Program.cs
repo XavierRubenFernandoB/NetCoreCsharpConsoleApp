@@ -13,6 +13,8 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection.Metadata.Ecma335;
+using System.Diagnostics.CodeAnalysis;
+using System.Collections.ObjectModel;
 
 namespace NetCoreCsharpConsoleApp
 {
@@ -743,22 +745,61 @@ namespace NetCoreCsharpConsoleApp
         static void SampleList()
         {
             //List index, can include derived classes, Insert, indexof
-            List<SampleCustomerList> lstcust = new List<SampleCustomerList>(2);  //capacity is 2 but can overgrow dynamically
+            List<SampleCustomerr> lstcust = new List<SampleCustomerr>(200);  //capacity is 2 but can overgrow dynamically
+            SampleCustomerr customer1 = new SampleCustomerr() { ID = 101, Name = "Xavier", Salary = 1000, Type = "Sales" };
+            SampleCustomerr customer2 = new SampleCustomerr() { ID = 102, Name = "Madhu", Salary = 3000, Type = "Sales" };
+            SampleCustomerr customer3 = new SampleCustomerr() { ID = 103, Name = "Calvyn", Salary = 1000, Type = "Sales" }; //OVER GROW
 
-            SampleCustomerList customer1 = new SampleCustomerList() { ID = 101, Name = "Xavier", Salary = 1000 };
-            SampleCustomerList customer2 = new SampleCustomerList() { ID = 102, Name = "Madhu", Salary = 2000 };
-            SampleCustomerList customer3 = new SampleCustomerList() { ID = 103, Name = "Calvyn", Salary = 3000 }; //OVER GROW
             //CustDerived customer4 = new CustDerived() { ID = 104, Name = "Snowy", Salary = 4000, extra_attribute = "YES" }; //DERIVED CLASS
 
+            List<SampleCustomerr> lstretail = new List<SampleCustomerr>();
+            SampleCustomerr customer4 = new SampleCustomerr() { ID = 104, Name = "Snowy", Salary = 500, Type = "Retail" };
+            SampleCustomerr customer5 = new SampleCustomerr() { ID = 105, Name = "Bubble", Salary = 10000, Type = "Retail" };
+
+            //READ ONLY LIST
+            //ReadOnlyCollection<SampleCustomerr> lstreadonly = lstretail.AsReadOnly();
+            //lstreadonly.Add - will not have methods that add/remove etc. to the list collection
+
+            lstretail.Add(customer4);
+            lstretail.Add(customer5);
+
+            //ADD one at time
             lstcust.Add(customer1);
             lstcust.Add(customer2);
             lstcust.Add(customer3);
+            //ADD many at a time
+            lstcust.AddRange(lstretail);
 
-            lstcust.Insert(2, customer1);//INSERT                                                                           
+            //INSERT
+            //lstcust.Insert(5, customer1);
+            //lstcust.InsertRange(0, lstretail);
 
-            foreach (SampleCustomerList cust in lstcust)
+            //REMOVE
+            //lstcust.Remove(customer5);
+            //lstcust.RemoveAt(2);
+            //lstcust.RemoveAll(x => x.Type == "Retail");
+            //lstcust.RemoveRange(3, 2);
+
+            //BEFORE SORT
+            Console.WriteLine("Before Sort");
+            foreach (SampleCustomerr cust in lstcust) //lstcust.GetRange(0, 3)
             {
-                Console.WriteLine("{0}, {1}, {2}", cust.ID, cust.Name, cust.Salary);
+                Console.WriteLine("{0}, {1}, {2}, {3}", cust.ID, cust.Name, cust.Salary, cust.Type);
+            }
+
+            //3 ways to SORT
+            //SORT : IF CLASS IS AVAILABLE TO US
+            lstcust.Sort();
+            //SORT : IF CLASS IS NOT AVAILABLE TO US
+            SortByName sbn = new SortByName();
+            lstcust.Sort(sbn);
+            //SORT : Using Lambda expressions, since delegates approach looks complex
+            lstcust.Sort((c1, c2) => c1.Name.CompareTo(c2.Name));
+
+            Console.WriteLine("After Sort");
+            foreach (SampleCustomerr cust in lstcust) //lstcust.GetRange(0, 3)
+            {
+                Console.WriteLine("{0}, {1}, {2}, {3}", cust.ID, cust.Name, cust.Salary, cust.Type);
             }
 
             //DIFFERENT METHODS USED IN LIST
@@ -768,19 +809,24 @@ namespace NetCoreCsharpConsoleApp
 
             Console.WriteLine(lstcust.Exists(c => c.Salary > 5000));
 
-            SampleCustomerList result = lstcust.Find(c => c.Salary > 1500);
+            SampleCustomerr result = lstcust.Find(c => c.Salary > 1500);
             Console.WriteLine(result.Name);
 
-            SampleCustomerList result2 = lstcust.FindLast(c => c.Salary > 1500);
+            SampleCustomerr result2 = lstcust.FindLast(c => c.Salary > 1500);
             Console.WriteLine(result2.Name);
 
-            List<SampleCustomerList> lstresult = lstcust.FindAll(c => c.Salary > 1500);
+            List<SampleCustomerr> lstresult = lstcust.FindAll(c => c.Salary > 1500);
             Console.WriteLine(lstresult.Count);
 
             Console.WriteLine(lstcust.FindIndex(x => x.Salary > 1500));
 
             Console.WriteLine(lstcust.FindLastIndex(x => x.Salary > 1500));
 
+            Console.WriteLine(lstcust.TrueForAll(x => x.Salary > 1));
+
+            Console.WriteLine(lstcust.Capacity);
+            lstcust.TrimExcess();
+            Console.WriteLine(lstcust.Capacity);
             //ALSO SUPPORTS:
             /*
             Array to List
@@ -1434,14 +1480,28 @@ namespace NetCoreCsharpConsoleApp
     #endregion
 
     #region LIST COLLECTION
-    public class SampleCustomerList
+    public class SampleCustomerr : IComparable<SampleCustomerr>
     {
         public int ID { get; set; }
         public string Name { get; set; }
         public int Salary { get; set; }
+        public string Type { get; set; }
+
+        public int CompareTo(SampleCustomerr obj)
+        {
+            return this.Salary.CompareTo(obj.Salary);
+        }
     }
 
-    public class CustDerived : SampleCustomerList
+    public class SortByName : IComparer<SampleCustomerr>
+    {
+        public int Compare(SampleCustomerr x, SampleCustomerr y)
+        {
+            return x.Name.CompareTo(y.Name);
+        }
+    }
+
+    public class CustDerived : SampleCustomerr
     {
         public string extra_attribute { get; set; }
     }

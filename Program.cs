@@ -243,8 +243,12 @@ namespace NetCoreCsharpConsoleApp
             SampleMethodParametersOptional();
 
             Console.WriteLine("--------------DICTIONARY-----------------");
-            //71
+            //72,73
             SampleDictionary();
+
+            Console.WriteLine("--------------LIST COLLECTION-----------------");
+            //74
+            SampleList();
         }
 
         public static void MethodParameters(int i, out int j, ref int k, params int[] numbers)
@@ -732,6 +736,57 @@ namespace NetCoreCsharpConsoleApp
                 Customr eachcustomer = custkeyvaluepair.Value;
                 Console.WriteLine("Value is {0}, {1}, {2}", eachcustomer.EmpID, eachcustomer.Name, eachcustomer.Salary);
             }
+        }
+        #endregion
+
+        #region LIST COLLECTION
+        static void SampleList()
+        {
+            //List index, can include derived classes, Insert, indexof
+            List<SampleCustomerList> lstcust = new List<SampleCustomerList>(2);  //capacity is 2 but can overgrow dynamically
+
+            SampleCustomerList customer1 = new SampleCustomerList() { ID = 101, Name = "Xavier", Salary = 1000 };
+            SampleCustomerList customer2 = new SampleCustomerList() { ID = 102, Name = "Madhu", Salary = 2000 };
+            SampleCustomerList customer3 = new SampleCustomerList() { ID = 103, Name = "Calvyn", Salary = 3000 }; //OVER GROW
+            //CustDerived customer4 = new CustDerived() { ID = 104, Name = "Snowy", Salary = 4000, extra_attribute = "YES" }; //DERIVED CLASS
+
+            lstcust.Add(customer1);
+            lstcust.Add(customer2);
+            lstcust.Add(customer3);
+
+            lstcust.Insert(2, customer1);//INSERT                                                                           
+
+            foreach (SampleCustomerList cust in lstcust)
+            {
+                Console.WriteLine("{0}, {1}, {2}", cust.ID, cust.Name, cust.Salary);
+            }
+
+            //DIFFERENT METHODS USED IN LIST
+            Console.WriteLine(lstcust.IndexOf(customer1, 0, 2));
+
+            Console.WriteLine(lstcust.Contains(customer2));
+
+            Console.WriteLine(lstcust.Exists(c => c.Salary > 5000));
+
+            SampleCustomerList result = lstcust.Find(c => c.Salary > 1500);
+            Console.WriteLine(result.Name);
+
+            SampleCustomerList result2 = lstcust.FindLast(c => c.Salary > 1500);
+            Console.WriteLine(result2.Name);
+
+            List<SampleCustomerList> lstresult = lstcust.FindAll(c => c.Salary > 1500);
+            Console.WriteLine(lstresult.Count);
+
+            Console.WriteLine(lstcust.FindIndex(x => x.Salary > 1500));
+
+            Console.WriteLine(lstcust.FindLastIndex(x => x.Salary > 1500));
+
+            //ALSO SUPPORTS:
+            /*
+            Array to List
+            List to Array
+            List to Dictionary
+            */
         }
         #endregion
     }
@@ -1375,6 +1430,20 @@ namespace NetCoreCsharpConsoleApp
         public int EmpID { get; set; }
         public string Name { get; set; }
         public int Salary { get; set; }
+    }
+    #endregion
+
+    #region LIST COLLECTION
+    public class SampleCustomerList
+    {
+        public int ID { get; set; }
+        public string Name { get; set; }
+        public int Salary { get; set; }
+    }
+
+    public class CustDerived : SampleCustomerList
+    {
+        public string extra_attribute { get; set; }
     }
     #endregion
 }

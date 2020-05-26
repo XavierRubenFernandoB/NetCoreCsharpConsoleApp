@@ -251,6 +251,14 @@ namespace NetCoreCsharpConsoleApp
             Console.WriteLine("--------------LIST COLLECTION-----------------");
             //74
             SampleList();
+
+            Console.WriteLine("--------------QUEUE-----------------");
+            //82
+            SampleQueue();
+
+            Console.WriteLine("--------------STACK-----------------");
+            //82
+            SampleStack();
         }
 
         public static void MethodParameters(int i, out int j, ref int k, params int[] numbers)
@@ -833,6 +841,60 @@ namespace NetCoreCsharpConsoleApp
             List to Array
             List to Dictionary
             */
+        }
+        #endregion
+
+        #region QUEUE
+        static void SampleQueue()
+        {
+            Queue<QCustomer> qCustomers = new Queue<QCustomer>();
+
+            QCustomer customer1 = new QCustomer() { ID = 101, Name = "Xavier", Salary = 1000, Type = "Sales" };
+            QCustomer customer2 = new QCustomer() { ID = 102, Name = "Madhu", Salary = 3000, Type = "Sales" };
+            QCustomer customer3 = new QCustomer() { ID = 103, Name = "Calvyn", Salary = 1000, Type = "Sales" }; //OVER GROW
+
+            qCustomers.Enqueue(customer1);
+            qCustomers.Enqueue(customer2);
+            qCustomers.Enqueue(customer3);
+
+            Console.WriteLine("Queue count is {0}", qCustomers.Count);
+
+            QCustomer qFIFO = qCustomers.Dequeue();                     //FIFO
+            Console.WriteLine("Dequed Customer is {0}", qFIFO.Name);
+            Console.WriteLine("Queue count is {0}", qCustomers.Count);
+
+            QCustomer pFIFO = qCustomers.Peek();
+            Console.WriteLine("Peek Customer is {0}", pFIFO.Name);
+            Console.WriteLine("Queue count is {0}", qCustomers.Count);
+
+            Console.WriteLine("Xavier is there = {0}", qCustomers.Contains(customer1));
+        }
+        #endregion
+
+        #region STACK
+        static void SampleStack()
+        {
+            Stack<StackCustomer> sCustomers = new Stack<StackCustomer>(2);
+
+            StackCustomer customer1 = new StackCustomer() { ID = 101, Name = "Xavier", Salary = 1000, Type = "Sales" };
+            StackCustomer customer2 = new StackCustomer() { ID = 102, Name = "Madhu", Salary = 3000, Type = "Sales" };
+            StackCustomer customer3 = new StackCustomer() { ID = 103, Name = "Calvyn", Salary = 1000, Type = "Sales" }; //OVER GROW
+
+            sCustomers.Push(customer1);
+            sCustomers.Push(customer2);
+            sCustomers.Push(customer3);
+
+            Console.WriteLine("Stack count is {0}", sCustomers.Count);
+
+            StackCustomer sLIFO = sCustomers.Pop();                     //LIFO
+            Console.WriteLine("Pop out Customer is {0}", sLIFO.Name);
+            Console.WriteLine("Stack count is {0}", sCustomers.Count);
+
+            StackCustomer pLIFO = sCustomers.Peek();
+            Console.WriteLine("Peek Customer is {0}", pLIFO.Name);
+            Console.WriteLine("Queue count is {0}", sCustomers.Count);
+
+            Console.WriteLine("Xavier is there = {0}", sCustomers.Contains(customer1));
         }
         #endregion
     }
@@ -1504,6 +1566,26 @@ namespace NetCoreCsharpConsoleApp
     public class CustDerived : SampleCustomerr
     {
         public string extra_attribute { get; set; }
+    }
+    #endregion
+
+    #region QUEUE
+    public class QCustomer 
+    {
+        public int ID { get; set; }
+        public string Name { get; set; }
+        public int Salary { get; set; }
+        public string Type { get; set; }
+    }
+    #endregion
+
+    #region STACK
+    public class StackCustomer
+    {
+        public int ID { get; set; }
+        public string Name { get; set; }
+        public int Salary { get; set; }
+        public string Type { get; set; }
     }
     #endregion
 }

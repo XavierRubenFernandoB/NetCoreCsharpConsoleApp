@@ -259,6 +259,10 @@ namespace NetCoreCsharpConsoleApp
             Console.WriteLine("--------------STACK-----------------");
             //82
             SampleStack();
+
+            Console.WriteLine("--------------MULTI-THREADING-----------------");
+            //82
+            SampleMultiThreading();
         }
 
         public static void MethodParameters(int i, out int j, ref int k, params int[] numbers)
@@ -895,6 +899,29 @@ namespace NetCoreCsharpConsoleApp
             Console.WriteLine("Queue count is {0}", sCustomers.Count);
 
             Console.WriteLine("Xavier is there = {0}", sCustomers.Contains(customer1));
+        }
+        #endregion
+
+        #region
+        static void SampleMultiThreading()
+        {
+            Console.WriteLine("NOT TYPE SAFE");
+            Console.WriteLine("Enter the target no.");
+            object target = Console.ReadLine();
+            SampleThread number = new SampleThread();
+
+            //ParameterizedThreadStart parameterizedThreadStart = new ParameterizedThreadStart(number.PrintNumbers);
+            //Thread mythread = new Thread(parameterizedThreadStart);
+            //(OR) simply
+            Thread mythread = new Thread(number.PrintNumbers);
+            mythread.Start(target);
+
+            Console.WriteLine("TYPE SAFE");
+            Console.WriteLine("Enter the target no.");
+            int mytarget = Convert.ToInt32(Console.ReadLine());
+            SampleThread number1 = new SampleThread(mytarget);
+            Thread mythread1 = new Thread(new ThreadStart(number1.PrintNumbersTypeSafe));
+            mythread1.Start();
         }
         #endregion
     }
@@ -1586,6 +1613,44 @@ namespace NetCoreCsharpConsoleApp
         public string Name { get; set; }
         public int Salary { get; set; }
         public string Type { get; set; }
+    }
+    #endregion
+
+    #region Multi-Threading
+    public class SampleThread
+    {
+        //NOT TYPE SAFE EXAMPLE
+        public SampleThread()
+        {
+
+        }
+        public void PrintNumbers(object target)
+        {
+            int number = 0;
+            if (int.TryParse(target.ToString(), out number))
+            {
+                for (int i = 0; i < number; i++)
+                {
+                    Console.WriteLine(i);
+                }
+            }
+        }
+
+        //TYPE SAFE EXAMPLE
+        public int mytarget { get; set; }
+
+        public SampleThread(int input_target)
+        {
+            this.mytarget = input_target;
+        }
+
+        public void PrintNumbersTypeSafe()
+        {
+            for (int i = 0; i < mytarget; i++)
+            {
+                Console.WriteLine(i);
+            }
+        }
     }
     #endregion
 }

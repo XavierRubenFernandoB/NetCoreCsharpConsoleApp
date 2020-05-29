@@ -15,6 +15,8 @@ using System.ComponentModel.DataAnnotations;
 using System.Reflection.Metadata.Ecma335;
 using System.Diagnostics.CodeAnalysis;
 using System.Collections.ObjectModel;
+using System.Security.Cryptography.X509Certificates;
+using System.Diagnostics;
 
 namespace NetCoreCsharpConsoleApp
 {
@@ -263,6 +265,18 @@ namespace NetCoreCsharpConsoleApp
             Console.WriteLine("--------------MULTI-THREADING-----------------");
             //82
             SampleMultiThreading();
+
+            Console.WriteLine("--------------JOIN & ISALIVE-----------------");
+            //82
+            SampleJoinIsAlive();
+
+            Console.WriteLine("--------------INTERLOCKED & LOCK-----------------");
+            //82
+            SampleInterLockedAndLock();
+
+            Console.WriteLine("--------------DEADLOCKS-----------------");
+            //95.96
+            SampleDeadlocks();
         }
 
         public static void MethodParameters(int i, out int j, ref int k, params int[] numbers)
@@ -902,7 +916,7 @@ namespace NetCoreCsharpConsoleApp
         }
         #endregion
 
-        #region
+        #region Multi-threading
         static void SampleMultiThreading()
         {
             Console.WriteLine("NOT TYPE SAFE");
@@ -914,14 +928,134 @@ namespace NetCoreCsharpConsoleApp
             //Thread mythread = new Thread(parameterizedThreadStart);
             //(OR) simply
             Thread mythread = new Thread(number.PrintNumbers);
-            mythread.Start(target);
+            //mythread.Start(target);
 
             Console.WriteLine("TYPE SAFE");
             Console.WriteLine("Enter the target no.");
             int mytarget = Convert.ToInt32(Console.ReadLine());
             SampleThread number1 = new SampleThread(mytarget);
             Thread mythread1 = new Thread(new ThreadStart(number1.PrintNumbersTypeSafe));
-            mythread1.Start();
+            //mythread1.Start();
+
+            Console.WriteLine("GET RETURN VALUE FROM CALL BACK METHOD (DELEGATE)");
+            Console.WriteLine("Enter the target no.");
+            int _mytarget = Convert.ToInt32(Console.ReadLine());
+            SumOfNumbersCallBack sumOfNumbersCallBack = new SumOfNumbersCallBack(PrintSumOfNumbers);
+            SampleThread number2 = new SampleThread(_mytarget, sumOfNumbersCallBack);
+            Thread mythread2 = new Thread(new ThreadStart(number2.ComputeSumOfNumbers));
+            mythread2.Start();
+            mythread2.Join();
+        }
+
+        //Implementation of Delegate
+        public static void PrintSumOfNumbers(int sum)
+        {
+            Console.WriteLine("Sum of numbers is {0}", sum);
+        }
+
+        #endregion
+
+        #region Join & IsAlive
+        static void SampleJoinIsAlive()
+        {
+            Thread thread1 = new Thread(MethodA);
+            thread1.Start();
+            Console.WriteLine("Thread one Alive status {0}", thread1.IsAlive);
+            thread1.Join();
+            Console.WriteLine("Thread one Alive status {0}", thread1.IsAlive);
+
+            Thread thread2 = new Thread(MethodB);
+            thread2.Start();
+            thread2.Join();
+        }
+
+        static void MethodA()
+        {
+            Thread.Sleep(5000);
+            Console.WriteLine("Printed from method A");
+        }
+
+        static void MethodB()
+        {
+            Console.WriteLine("Printed from method B");
+        }
+        #endregion
+
+        #region INTERLOCKED & LOCK
+        static int Total = 0;
+        static object _lock = new object();
+        static void SampleInterLockedAndLock()
+        {
+            Stopwatch mystopwatch = Stopwatch.StartNew();
+
+            Thread t1 = new Thread(AddOneMillion);
+            Thread t2 = new Thread(AddOneMillion);
+            Thread t3 = new Thread(AddOneMillion);
+
+            t1.Start(); t2.Start(); t3.Start();
+            t1.Join(); t2.Join(); t3.Join();
+
+            mystopwatch.Stop();
+
+            Console.WriteLine("3 millions is {0}", Total);
+            Console.WriteLine("Time take is " + mystopwatch.ElapsedTicks.ToString());
+        }
+
+        public static void AddOneMillion()
+        {
+            for (int i = 0; i < 1000000; i++)
+            {
+                //NORMAL
+                //Total++
+
+                //USING INTERLOCKED PROVIDES BETTER PERFORMANCE
+                //Interlocked.Increment(ref Total);
+
+                //USING LOCK DOES NOT PROVID PERFORMANCE SINCE IT LOCKS THE OTHER THREADS
+                //lock (_lock)
+                //{
+                //    Total++;   
+                //}
+
+                bool _lockTaken = false;
+                Monitor.Enter(_lock, ref _lockTaken);
+                try
+                {
+                    Total++;
+                }
+                catch 
+                { 
+                }
+                finally
+                {
+                    if (_lockTaken)
+                        Monitor.Exit(_lock);
+                }
+            }
+        }
+        #endregion
+
+        #region DEADLOCKS
+        static void SampleDeadlocks()
+        {
+            Console.WriteLine("Main Started");
+
+            Account A = new Account(101, 5000);
+            Account B = new Account(102, 3000);
+
+            AccountManager accountManagerA = new AccountManager(A, B, 1000);
+            AccountManager accountManagerB = new AccountManager(B, A, 2000);
+
+            Thread T1 = new Thread(accountManagerA.Transfer);
+            Thread T2 = new Thread(accountManagerB.Transfer);
+
+            T1.Start();
+            T2.Start();
+
+            T1.Join();
+            T2.Join();
+
+            Console.WriteLine("Main Completed");
         }
         #endregion
     }
@@ -1597,7 +1731,7 @@ namespace NetCoreCsharpConsoleApp
     #endregion
 
     #region QUEUE
-    public class QCustomer 
+    public class QCustomer
     {
         public int ID { get; set; }
         public string Name { get; set; }
@@ -1617,9 +1751,12 @@ namespace NetCoreCsharpConsoleApp
     #endregion
 
     #region Multi-Threading
+    //FOR EXAMPLE : RETURN VALUE FROM METHOD USING CALL BACK METHOD (DELEGATE)
+    public delegate void SumOfNumbersCallBack(int SumOfNumbers);
+
     public class SampleThread
     {
-        //NOT TYPE SAFE EXAMPLE
+        //EXAMPLE: NOT TYPE SAFE INPUT
         public SampleThread()
         {
 
@@ -1636,7 +1773,7 @@ namespace NetCoreCsharpConsoleApp
             }
         }
 
-        //TYPE SAFE EXAMPLE
+        //EXAMPLE : TYPE SAFE INPUT
         public int mytarget { get; set; }
 
         public SampleThread(int input_target)
@@ -1651,6 +1788,114 @@ namespace NetCoreCsharpConsoleApp
                 Console.WriteLine(i);
             }
         }
+
+        //EXAMPLE : RETURN VALUE FROM METHOD USING CALL BACK METHOD (DELEGATE)
+        public int _mytarget { get; set; }
+        SumOfNumbersCallBack _callbackmethod;
+
+        public SampleThread(int mytarget, SumOfNumbersCallBack callbackmethod)
+        {
+            this._mytarget = mytarget;
+            this._callbackmethod = callbackmethod;
+        }
+
+        public void ComputeSumOfNumbers()
+        {
+            int sum = 0;
+            for (int i = 0; i < _mytarget; i++)
+            {
+                sum += i;
+            }
+            if (_callbackmethod != null)
+                _callbackmethod(sum);
+        }
     }
+    #endregion
+
+    #region DEADLOCKS
+    public class Account
+    {
+        int _id;
+        double _balance;
+
+        public int ID 
+        { 
+            get 
+            { 
+                return _id; 
+            } 
+        }
+
+        public Account(int id, double balance)
+        {
+            this._id = id;
+            this._balance = balance;
+        }
+
+        public void Withdraw(double amount)
+        {
+            _balance -= amount;
+        }
+
+        public void Deposit(double amount)
+        {
+            _balance += amount;
+        }
+    }
+
+    public class AccountManager
+    {
+        Account _fromAccount;
+        Account _toAccount;
+        double _amountToTransfer;
+
+        public AccountManager(Account fromAccount, Account toAccount, double amountToTransfer)
+        {
+            this._fromAccount = fromAccount;
+            this._toAccount = toAccount;
+            this._amountToTransfer = amountToTransfer;
+        }
+
+        public void Transfer()
+        {
+            //PLEASE CHECK COMMENTS FOR EACH LINE IN THE C# DOC.
+
+            //DEADLOCK
+            //lock (_fromAccount)
+            //{
+            //    Thread.Sleep(1000); //THIS CAUSES THE DEADLOCK
+            //    lock (_toAccount)
+            //    {
+            //        _fromAccount.Withdraw(_amountToTransfer);
+            //        _toAccount.Deposit(_amountToTransfer);
+            //    }
+            //}
+
+            //DEADLOCK TAKEN CARE
+            object _lock1, _lock2;
+
+            if (_fromAccount.ID  < _toAccount.ID)
+            {
+                _lock1 = _fromAccount;
+                _lock2 = _toAccount;
+            }
+            else
+            {
+                _lock1 = _toAccount;
+                _lock2 = _fromAccount;
+            }
+
+            lock (_lock1)
+            {
+                Thread.Sleep(1000); 
+                lock (_lock2)
+                {
+                    _fromAccount.Withdraw(_amountToTransfer);
+                    _toAccount.Deposit(_amountToTransfer);
+                }
+            }
+        }
+    }
+
     #endregion
 }

@@ -277,6 +277,10 @@ namespace NetCoreCsharpConsoleApp
             Console.WriteLine("--------------DEADLOCKS-----------------");
             //95.96
             SampleDeadlocks();
+
+            Console.WriteLine("--------------ANONYMOUS METHODS, LAMBDA EXPRESSIONS, FUNC-----------------");
+            //98,99,100
+            SampleAnonymousMethods();
         }
 
         public static void MethodParameters(int i, out int j, ref int k, params int[] numbers)
@@ -1023,8 +1027,8 @@ namespace NetCoreCsharpConsoleApp
                 {
                     Total++;
                 }
-                catch 
-                { 
+                catch
+                {
                 }
                 finally
                 {
@@ -1057,6 +1061,43 @@ namespace NetCoreCsharpConsoleApp
 
             Console.WriteLine("Main Completed");
         }
+        #endregion
+
+        #region ANONYMOUS METHODS, LAMBDA EXPRESSIONS, FUNC
+
+        static void SampleAnonymousMethods()
+        {
+            List<SampleCustomerr> lstcust = new List<SampleCustomerr>();
+            SampleCustomerr customer1 = new SampleCustomerr() { ID = 101, Name = "Xavier", Salary = 1000, Type = "Sales" };
+            SampleCustomerr customer2 = new SampleCustomerr() { ID = 102, Name = "Madhu", Salary = 3000, Type = "Sales" };
+            SampleCustomerr customer3 = new SampleCustomerr() { ID = 103, Name = "Calvyn", Salary = 1000, Type = "Sales" };
+
+            lstcust.Add(customer1);
+            lstcust.Add(customer2);
+            lstcust.Add(customer3);
+
+            //ANONYMOUS METHODS
+            SampleCustomerr result = lstcust.Find(
+                delegate(SampleCustomerr x) 
+                { 
+                    return x.ID == 102; 
+                });
+            Console.WriteLine("Output is {0}", result.Name);
+
+            //LAMBDA EXPRESSIONS
+            SampleCustomerr result2 = lstcust.Find(x => x.ID == 102);
+            Console.WriteLine("Output is {0}", result2.Name);
+
+            //FUNC
+            Func<SampleCustomerr, string> selector = x => x.Name;
+            IEnumerable<string> names = lstcust.Select(selector);           //USING FUNC
+            //IEnumerable<string> names = lstcust.Select(x => x.Name);      //SAME USING LAMBDA
+            foreach (string name in names)
+            { 
+                Console.WriteLine("Name is " + name);
+            }
+        }
+
         #endregion
     }
 
@@ -1818,12 +1859,12 @@ namespace NetCoreCsharpConsoleApp
         int _id;
         double _balance;
 
-        public int ID 
-        { 
-            get 
-            { 
-                return _id; 
-            } 
+        public int ID
+        {
+            get
+            {
+                return _id;
+            }
         }
 
         public Account(int id, double balance)
@@ -1874,7 +1915,7 @@ namespace NetCoreCsharpConsoleApp
             //DEADLOCK TAKEN CARE
             object _lock1, _lock2;
 
-            if (_fromAccount.ID  < _toAccount.ID)
+            if (_fromAccount.ID < _toAccount.ID)
             {
                 _lock1 = _fromAccount;
                 _lock2 = _toAccount;
@@ -1887,7 +1928,7 @@ namespace NetCoreCsharpConsoleApp
 
             lock (_lock1)
             {
-                Thread.Sleep(1000); 
+                Thread.Sleep(1000);
                 lock (_lock2)
                 {
                     _fromAccount.Withdraw(_amountToTransfer);

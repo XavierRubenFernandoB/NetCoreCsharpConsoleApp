@@ -281,6 +281,10 @@ namespace NetCoreCsharpConsoleApp
             Console.WriteLine("--------------ANONYMOUS METHODS, LAMBDA EXPRESSIONS, FUNC-----------------");
             //98,99,100
             SampleAnonymousMethods();
+
+            Console.WriteLine("--------------ASYNC & AWAIT-----------------");
+            //101
+            SampleAsyncAwait();
         }
 
         public static void MethodParameters(int i, out int j, ref int k, params int[] numbers)
@@ -1098,6 +1102,13 @@ namespace NetCoreCsharpConsoleApp
             }
         }
 
+        #endregion
+
+        #region ASYNC & AWAIT
+        static void SampleAsyncAwait()
+        { 
+
+        }
         #endregion
     }
 
